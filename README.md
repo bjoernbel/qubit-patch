@@ -1,7 +1,7 @@
 # FRB-BB-2026-KI-001 | Fraktaler Beryllium Neutronen-Multiplikator
 
 **DOK-NR: FRB-BB-2026-KI-001 | REV: 01 | DATUM: 2026**
-**Human + AI Co-Design | Wunstorf / Hannover**
+**Human + AI Co-Design | Braunschweig**
 
 > Wenn wir in einer Simulation leben, dann ist die eleganteste Art zu hacken, ihr zu zeigen, dass sie schöner sein könnte.
 
