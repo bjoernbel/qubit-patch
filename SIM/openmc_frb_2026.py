@@ -1,8 +1,3 @@
-"""
-FRB-BB-2026-KI-001 - Fractal Beryllium Multiplier
-60mm element, 63 channels, TBR 1.21 -> 1.28
-Zenodo: 10.5281/zenodo.23460917
-"""
 import openmc
 import numpy as np
 
