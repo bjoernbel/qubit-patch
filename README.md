@@ -29,4 +29,4 @@ Keine neue Physik. Nur bessere Geometrie.
 2. Simulieren: python SIM/monte_carlo_tbr.py
 3. Quanten: python SIM/qiskit_frb_2026.py (oder auf IQM)
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23460917.svg)](https://doi.org/10.5281/zenodo.23460917)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23461150.svg)](https://doi.org/10.5281/zenodo.23461150)
