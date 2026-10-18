@@ -25,10 +25,6 @@ Keine neue Physik. Nur bessere Geometrie.
 | `figures/` | Alle Diagramme mit Datum 2026 |
 
 ## Schnellstart
-
-### 1. Drucken (physischer Beweis)
-```bash
-# In deinem FabLab Wunstorf
-# STL laden, PLA oder Metall
-# 60mm hoch, 0.2mm Layer
-```
+1. Drucken: STL laden, PLA/Metall, 60mm hoch, 0.2mm Layer
+2. Simulieren: python SIM/monte_carlo_tbr.py
+3. Quanten: python SIM/qiskit_frb_2026.py (oder auf IQM)
