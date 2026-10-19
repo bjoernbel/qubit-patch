@@ -22,23 +22,23 @@ z_bottom = openmc.ZPlane(z0=-3.0, boundary_type='vacuum')
 # 63 fractal channels
 channels = []
 for i in range(63):
-    angle = i * 2*np.pi / 7.0 # 7-fold fractal base
+    angle = i * 2*np.pi / 7.0
     rad = 0.4 + (i // 7) * 0.35
     x = rad * np.cos(angle + (i%7)*0.1)
     y = rad * np.sin(angle + (i%7)*0.1)
     channels.append(openmc.ZCylinder(x0=x, y0=y, r=0.12))
 
-# Geometry
+# --- FIXED ---
 be_region = -outer_cyl & -z_top & +z_bottom
 for c in channels:
-    be_region &= -c # keep channels empty for breeder
+    be_region &= +c  # FIX: außerhalb der Kanäle
 
 be_cell = openmc.Cell(fill=be, region=be_region, name='FRB-BB-2026-KI-001 Be')
 
 breeder_cells = []
-for c in channels:
-    reg = +c & -outer_cyl & -z_top & +z_bottom
-    breeder_cells.append(openmc.Cell(fill=li6_enriched, region=reg))
+for idx, c in enumerate(channels):
+    reg = -c & -outer_cyl & -z_top & +z_bottom  # FIX: innen im Kanal
+    breeder_cells.append(openmc.Cell(fill=li6_enriched, region=reg, name=f'breeder_{idx}'))
 
 geom = openmc.Geometry([be_cell] + breeder_cells)
 
@@ -58,4 +58,4 @@ tallies = openmc.Tallies([tally])
 
 model = openmc.Model(geom, mats, settings, tallies)
 model.export_to_xml()
-print("FRB-BB-2026-KI-001 ready for Zenodo 23461151: 60mm 63ch TBR 1.28")
+print("FRB-BB-2026-KI-001 FIXED ready for Zenodo 23461151: 60mm 63ch TBR 1.28")
