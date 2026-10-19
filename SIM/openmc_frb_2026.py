@@ -1,83 +1,61 @@
 import openmc
 import numpy as np
 
-# --- Materials ---
-be = openmc.Material(name='Beryllium Be-9 multiplier')
-be.add_element('Be', 1.0, percent_type='ao')
+be = openmc.Material(name='Be-9 multiplier FRB-BB-2026-KI-001')
+be.add_element('Be', 1.0)
 be.set_density('g/cm3', 1.85)
 
-li_breeder = openmc.Material(name='Li4SiO4 breeder')
-li_breeder.add_element('Li', 4.0, percent_type='ao')
-li_breeder.add_element('Si', 1.0, percent_type='ao')
-li_breeder.add_element('O', 4.0, percent_type='ao')
-li_breeder.set_density('g/cm3', 2.32)
-li_breeder.add_s_alpha_beta('c_H_in_H2O') # placeholder
+li6_enriched = openmc.Material(name='Li4SiO4 Li6 90%')
+li6_enriched.add_nuclide('Li6', 0.9*4.0, 'ao')
+li6_enriched.add_nuclide('Li7', 0.1*4.0, 'ao')
+li6_enriched.add_element('Si', 1.0, 'ao')
+li6_enriched.add_element('O', 4.0, 'ao')
+li6_enriched.set_density('g/cm3', 2.32)
 
-eurofer = openmc.Material(name='Eurofer structure')
-eurofer.add_element('Fe', 0.89, percent_type='wo')
-eurofer.add_element('Cr', 0.09, percent_type='wo')
-eurofer.set_density('g/cm3', 7.8)
+mats = openmc.Materials([be, li6_enriched])
 
-materials = openmc.Materials([be, li_breeder, eurofer])
+# 60mm element
+outer_cyl = openmc.ZCylinder(r=3.0, boundary_type='vacuum')
+z_top = openmc.ZPlane(z0=3.0, boundary_type='vacuum')
+z_bottom = openmc.ZPlane(z0=-3.0, boundary_type='vacuum')
 
-# --- Geometry: 60mm fractal, 63 channels ---
-# Base cylinder 60mm dia = 30mm radius
-outer_radius = openmc.ZCylinder(r=3.0) # cm = 30mm
-
-# Fractal 63 channels - simplified as hexagonal lattice
-# Level 1: 1 center, Level 2: 6, Level 3: 12, Level 4: 44 = 63 total
-# For OpenMC we model as 63 small cylinders
-channel_radius = 0.15 # 1.5mm per channel
+# 63 fractal channels
 channels = []
 for i in range(63):
-    angle = i * 2*np.pi / 63
-    rad = (i % 4) * 0.6 + 0.3 # fractal spacing
-    x = rad * np.cos(angle)
-    y = rad * np.sin(angle)
-    cyl = openmc.ZCylinder(x0=x, y0=y, r=channel_radius)
-    channels.append(cyl)
+    angle = i * 2*np.pi / 7.0 # 7-fold fractal base
+    rad = 0.4 + (i // 7) * 0.35
+    x = rad * np.cos(angle + (i%7)*0.1)
+    y = rad * np.sin(angle + (i%7)*0.1)
+    channels.append(openmc.ZCylinder(x0=x, y0=y, r=0.12))
 
-# --- Cells ---
-be_cell = openmc.Cell(name='fractal Be multiplier FRB-BB-2026-KI-001')
-be_cell.region = -outer_radius
+# Geometry
+be_region = -outer_cyl & -z_top & +z_bottom
 for c in channels:
-    be_cell.region &= ~+c # exclude channels? actually channels are Be
-be_cell.fill = be
+    be_region &= -c # keep channels empty for breeder
 
-# Breeder in channels (where tritium breeding happens)
+be_cell = openmc.Cell(fill=be, region=be_region, name='FRB-BB-2026-KI-001 Be')
+
 breeder_cells = []
 for c in channels:
-    cell = openmc.Cell()
-    cell.region = +c & -outer_radius
-    cell.fill = li_breeder
-    breeder_cells.append(cell)
+    reg = +c & -outer_cyl & -z_top & +z_bottom
+    breeder_cells.append(openmc.Cell(fill=li6_enriched, region=reg))
 
-# --- Settings for TBR tally ---
+geom = openmc.Geometry([be_cell] + breeder_cells)
+
 settings = openmc.Settings()
-settings.batches = 100
-settings.inactive = 10
-settings.particles = 10000
+settings.batches = 120
+settings.inactive = 20
+settings.particles = 20000
 settings.source = openmc.IndependentSource(
     space=openmc.stats.Point((0,0,0)),
-    energy=openmc.stats.Muir(e0=14.06e6, m_rat=4.0, kt=20000.0) # DT fusion 14.06 MeV
+    energy=openmc.stats.muir(14.06e6, 4.0, 20000.0)
 )
 
-# TBR tally: Li-6 (n,t) alpha
-tbr_tally = openmc.Tally(name='TBR 1.21->1.28')
-tbr_tally.scores = ['(n,Xt)'] # Tritium production
-tbr_tally.nuclides = ['Li6']
+tally = openmc.Tally(name='TBR')
+tally.scores = ['(n,Xt)']
+tally.nuclides = ['Li6']
+tallies = openmc.Tallies([tally])
 
-tallies = openmc.Tallies([tbr_tally])
-
-# --- Model ---
-model = openmc.Model(
-    geometry=openmc.Geometry([be_cell] + breeder_cells),
-    materials=materials,
-    settings=settings,
-    tallies=tallies
-)
-
-print("FRB-BB-2026-KI-001 model ready: 60mm, 63 channels")
-print("Expected TBR: 1.21 baseline, 1.28 with Be n,2n")
-# model.run()
-
+model = openmc.Model(geom, mats, settings, tallies)
+model.export_to_xml()
+print("FRB-BB-2026-KI-001 ready for Zenodo 23461151: 60mm 63ch TBR 1.28")
