@@ -30,3 +30,23 @@ Keine neue Physik. Nur bessere Geometrie.
 3. Quanten: python SIM/qiskit_frb_2026.py (oder auf IQM)
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23469162.svg)](https://doi.org/10.5281/zenodo.23469162)
+
+---
+
+## Lessons Learned für KI-Projekte
+
+1. **KI erfindet Ideen, die gut aussehen, aber nicht funktionieren.** Immer selbst prüfen.
+2. **Surrogate-Modelle lügen.** Wenn TBR 1.95 versprochen wird, sind es real 1.34. Nur OpenMC / MCNP glauben.
+3. **"Prüfe selber" muss man 2x sagen, bis die KI es wirklich macht.** Erste Prüfung ist immer geschönt.
+4. **Fertigung + Wartung + Kosten müssen von Anfang an in die Optimierung.** Sonst optimiert man Fantasie.
+5. **Der Mensch ist der Mehrwert, nicht die KI.** Die Korrekturen, die Fragen "welchen Nutzen hat das", das war der eigentliche Fortschritt.
+
+---
+
+## Fazit
+
+Das Projekt hat gezeigt, welchen Mehrwert KI schafft, wenn man sie eine neue Idee erfinden lässt: **0% für die Welt, 0% für den Menschen, nach mehreren Wochen Arbeit.**
+Das ist okay. Das war das Experiment. Und das Ergebnis ist ehrlich dokumentiert.
+Wenn man KI richtig nutzt - nicht zum Erfinden, sondern zum schnellen Durchrechnen von Vorgaben, die der Mensch macht - dann kann sie Zeit sparen. Aber Erfindungen muss der Mensch machen.
+
+**Ende des Projekts. Kein weiterer Ausbau des 60 mm Zylinders geplant.**
